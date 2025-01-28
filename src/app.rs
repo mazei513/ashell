@@ -274,6 +274,13 @@ impl App {
                     *button_ui_ref,
                     self.config.position,
                 ),
+                Some((MenuType::Mpd, button_ui_ref)) => menu_wrapper(
+                    id,
+                    self.mpd.menu_view().map(Message::Mpd),
+                    MenuSize::Normal,
+                    *button_ui_ref,
+                    self.config.position,
+                ),
                 None => Row::new().into(),
             },
             None => Row::new().into(),

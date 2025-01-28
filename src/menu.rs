@@ -16,6 +16,7 @@ pub enum MenuType {
     Updates,
     Settings,
     Tray(String),
+    Mpd,
 }
 
 #[derive(Clone, Debug)]
