@@ -105,6 +105,27 @@ impl Default for ClockModuleConfig {
     }
 }
 
+#[derive(Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct MpdModuleConfig {
+    #[serde(default = "default_mpd_addr")]
+    pub addr: String,
+    pub max_length: usize,
+}
+
+fn default_mpd_addr() -> String {
+    "127.0.0.1:6600".to_string()
+}
+
+impl Default for MpdModuleConfig {
+    fn default() -> Self {
+        Self {
+            addr: default_mpd_addr(),
+            max_length: 100,
+        }
+    }
+}
+
 #[derive(Deserialize, Default, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsModuleConfig {
@@ -283,6 +304,7 @@ pub enum ModuleName {
     Clock,
     Privacy,
     Settings,
+    Mpd,
 }
 
 #[derive(Deserialize, Clone, Debug)]
@@ -367,6 +389,8 @@ pub struct Config {
     pub settings: SettingsModuleConfig,
     #[serde(default)]
     pub appearance: Appearance,
+    #[serde(default)]
+    pub mpd: MpdModuleConfig,
 }
 
 fn default_log_level() -> String {
@@ -393,6 +417,7 @@ impl Default for Config {
             clock: ClockModuleConfig::default(),
             settings: SettingsModuleConfig::default(),
             appearance: Appearance::default(),
+            mpd: MpdModuleConfig::default(),
         }
     }
 }

@@ -5,9 +5,9 @@ use crate::{
     menu::{menu_wrapper, MenuSize, MenuType},
     modules::{
         self, app_launcher::AppLauncher, clipboard::Clipboard, clock::Clock,
-        keyboard_layout::KeyboardLayout, keyboard_submap::KeyboardSubmap, privacy::Privacy,
-        settings::Settings, system_info::SystemInfo, tray::TrayModule, updates::Updates,
-        window_title::WindowTitle, workspaces::Workspaces,
+        keyboard_layout::KeyboardLayout, keyboard_submap::KeyboardSubmap, mpd::Mpd,
+        privacy::Privacy, settings::Settings, system_info::SystemInfo, tray::TrayModule,
+        updates::Updates, window_title::WindowTitle, workspaces::Workspaces,
     },
     outputs::{HasOutput, Outputs},
     position_button::ButtonUIRef,
@@ -40,6 +40,7 @@ pub struct App {
     pub clock: Clock,
     pub privacy: Privacy,
     pub settings: Settings,
+    pub mpd: Mpd,
 }
 
 #[derive(Debug, Clone)]
@@ -61,6 +62,7 @@ pub enum Message {
     Privacy(modules::privacy::PrivacyMessage),
     Settings(modules::settings::Message),
     WaylandEvent(WaylandEvent),
+    Mpd(modules::mpd::Message),
 }
 
 impl App {
@@ -68,6 +70,7 @@ impl App {
         || {
             let (outputs, task) = Outputs::new(config.position);
             let enable_workspace_filling = config.workspaces.enable_workspace_filling;
+            let mpd_addr = config.mpd.addr.clone();
             (
                 App {
                     logger,
@@ -85,6 +88,7 @@ impl App {
                     clock: Clock::default(),
                     privacy: Privacy::default(),
                     settings: Settings::default(),
+                    mpd: Mpd::new(mpd_addr),
                 },
                 task,
             )
@@ -224,6 +228,10 @@ impl App {
                 },
                 _ => Task::none(),
             },
+            Message::Mpd(message) => {
+                self.mpd.update(message, self.config.mpd.max_length);
+                Task::none()
+            }
         }
     }
 
